@@ -1,13 +1,11 @@
-A small JFlex+Cup parser example 
+Para compilar iniciamos la terminal en la carpeta donde tenemos el proyecto
+seguido de estos comandos:
 
-To compile:
->jflex lcalc.flex
->java java_cup.Main < ycalc.cup 
->en windows java -jar java-cup-11.jar ycalc-cup
->javac Main.java
-
-To run:
->java Main test.txt
+jflex lcalc.flex
+java -jar java-cup-11.jar ycalc-cup "en windows" 
+java java_cup.Main < ycalc.cup "en sistemas unix" 
+javac Main.java
+java Main test.txt
 
 
 Files:
