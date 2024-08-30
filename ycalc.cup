@@ -1,0 +1,160 @@
+/*
+  File Name: ycalc.cup
+  To Create: > java java_cup.Main < ycalc.cup
+	     >en windows java -jar java-cup-11.jar ycalc-cup
+*/
+   
+   
+/* ----------------------Preliminary Declarations Section--------------------*/
+   
+import java_cup.runtime.*;
+   
+parser code {:
+    
+    public void report_error(String message, Object info) {
+   
+        /* Create a StringBuffer called 'm' with the string 'Error' in it. */
+        StringBuffer m = new StringBuffer("Error");
+   
+        /* Check if the information passed to the method is the same
+           type as the type java_cup.runtime.Symbol. */
+        if (info instanceof java_cup.runtime.Symbol) {
+            /* Declare a java_cup.runtime.Symbol object 's' with the
+               information in the object info that is being typecasted
+               as a java_cup.runtime.Symbol object. */
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+   
+            /* Check if the line number in the input is greater or
+               equal to zero. */
+            if (s.left >= 0) {                
+                /* Add to the end of the StringBuffer error message
+                   the line number of the error in the input. */
+                m.append(" in line "+(s.left+1));   
+                /* Check if the column number in the input is greater
+                   or equal to zero. */
+                if (s.right >= 0)                    
+                    /* Add to the end of the StringBuffer error message
+                       the column number of the error in the input. */
+                    m.append(", column "+(s.right+1));
+            }
+        }
+   
+        /* Add to the end of the StringBuffer error message created in
+           this method the message that was passed into this method. */
+        m.append(" : "+message);
+   
+        /* Print the contents of the StringBuffer 'm', which contains
+           an error message, out on a line. */
+        System.err.println(m);
+    }
+   
+    /* Change the method report_fatal_error so when it reports a fatal
+       error it will display the line and column number of where the
+       fatal error occurred in the input as well as the reason for the
+       fatal error which is passed into the method in the object
+       'message' and then exit.*/
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+:};
+   
+
+   
+/* ------------Declaration of Terminals and Non Terminals Section----------- */
+   
+
+terminal           SEMI, PLUS, AND, OR, TIMES, LPAREN, RPAREN, ASSIGN, TRUE, FALSE, RETURN, MAIN;
+terminal           INT, BOOLEAN, VOID, LBRACE, RBRACE;
+terminal           Integer NUMBER;
+terminal           ID;   
+
+non terminal     expr_list, expr_part;
+non terminal     expr, prog, TIPO;
+   
+
+/* -------------Precedence and Associatively of Terminals Section----------- */
+   
+/*
+  Precedence of non terminals could be defined here.  If you do define
+  precedence here you won't need to worry about precedence in the
+  Grammar Section, i.e. that TIMES should have a higher precedence
+  than PLUS.
+  
+  The precedence defined here would look something like this where the
+  lower line always will have higher precedence than the line before it.
+*/   
+  precedence left OR;
+  precedence left AND;
+  precedence left PLUS; 
+  precedence left TIMES; 
+
+
+
+/* ----------------------------Grammar Section-------------------- */
+   
+
+   prog   ::= TIPO MAIN LPAREN RPAREN LBRACE expr_list RBRACE
+            ;
+   TIPO ::= INT
+            |
+            BOOLEAN
+            |
+            VOID
+ 	    ;
+   expr_list ::= expr_list expr_part
+                 | /* nada */
+                 ;
+   
+   expr_part ::= TIPO ID LPAREN RPAREN LBRACE expr_list RBRACE
+		| TIPO ID SEMI
+                | ID ASSIGN expr SEMI 
+		| RETURN expr SEMI
+                 {: /*System.out.println(" FIN ");*/ :}
+                 ;
+   
+   expr      ::= expr PLUS expr
+		 {:  :}
+                 |
+                 expr TIMES expr
+      		 {:  :}   
+                 |
+		 expr AND expr
+		 {:  :} 
+                 |
+	         expr OR expr
+                 {:  :} 
+                 |
+                 LPAREN expr RPAREN
+                 {:  :} 
+                 |
+		 TRUE
+		 {:  :} 
+                 |		 
+		 FALSE
+		 {:  :} 
+                 |
+                 NUMBER
+                 {:  :}                 
+                 |
+                 ID
+                 {:  :}
+                 ;
+
+
+
+/* The grammar for our parser.EJEMPLOS
+   
+   expr_list ::=   expr_list expr_part
+                 | expr_part
+   expr_part ::=   expr SEMI
+   expr      ::=   expr PLUS factor
+                 | expr MINUS factor
+                 | factor
+   factor    ::=   factor TIMES term
+                 | factor DIVIDE term
+                 | term
+   term     ::=    LPAREN expr RPAREN
+                 | NUMBER
+                 | ID     
+*/
