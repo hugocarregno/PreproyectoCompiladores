@@ -67,7 +67,7 @@ parser code {:
 terminal           SEMI, PLUS, AND, OR, TIMES, LPAREN, RPAREN, ASSIGN, TRUE, FALSE, RETURN, MAIN;
 terminal           INT, BOOLEAN, VOID, LBRACE, RBRACE;
 terminal           Integer NUMBER;
-terminal           ID;   
+terminal           String ID;   
 
 non terminal     expr_list, expr_part;
 non terminal     expr, prog, TIPO;
@@ -95,12 +95,13 @@ non terminal     expr, prog, TIPO;
    
 
    prog   ::= TIPO MAIN LPAREN RPAREN LBRACE expr_list RBRACE
+	      {:RESULT = new Arbol(new Simbolo(Etiqueta.PROGRAMA),expr_list, expr_part); :}
             ;
-   TIPO ::= INT
+   TIPO ::= INT {: RESULT = "int"; :}
             |
-            BOOLEAN
+            BOOLEAN {: RESULT = "Boolean"; :}
             |
-            VOID
+            VOID {: RESULT = "void"; :}
  	    ;
    expr_list ::= expr_list expr_part
                  | /* nada */

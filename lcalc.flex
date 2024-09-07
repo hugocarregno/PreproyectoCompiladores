@@ -124,7 +124,7 @@ dec_int_id = [A-Za-z_][A-Za-z_0-9]*
        that represents an identifier and the default value one that is
        given to all identifiers. */
     {dec_int_id}       { System.out.print(yytext());
-                         return symbol(sym.ID, new Integer(1));}
+                         return symbol(sym.ID, new String(yytext()));}
    
     /* Don't do anything if whitespace is found */
     {WhiteSpace}       { /* just skip what was found, do nothing */ }   
