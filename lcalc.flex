@@ -50,7 +50,10 @@ import java_cup.runtime.*;
     }
     
     /* Also creates a new java_cup.runtime.Symbol with information
-       about the current token, but this object has a value. */
+       about the current token, but this object has a value. 
+id.... idleft yyline     id value
+
+*/
     private Symbol symbol(int type, Object value) {
         return new Symbol(type, yyline, yycolumn, value);
     }
@@ -130,7 +133,7 @@ dec_int_id = [A-Za-z_][A-Za-z_0-9]*
     {WhiteSpace}       { /* just skip what was found, do nothing */ }   
 }
 
-
+"//".*			{ /* just skip what was found, do nothing */ } 
 /* No token was found for the input so through an error.  Print out an
    Illegal character message with the illegal character that was found. */
 [^]                    { throw new Error("Illegal character <"+yytext()+">"); }

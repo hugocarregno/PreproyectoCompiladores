@@ -15,7 +15,7 @@ public class Principal {
         Simbolo simbolo2 = new Simbolo(Etiqueta.VARIABLE,"y",Tipos.BOOL,0,2); // var y, tipo bool, valor?
         Simbolo simbolo3 = new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,4,1); // valor entero 4
         Simbolo simbolo4 = new Simbolo(Etiqueta.VALORBOOLEANO, "",Tipos.BOOL,1,2); // valor booleano true
-        Simbolo simbolo5 = new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,1,3); // valor entero 4
+        Simbolo simbolo5 = new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,1,3); // valor entero 1
       
         Simbolo progSim  = new Simbolo(Etiqueta.PROGRAMA); 
         

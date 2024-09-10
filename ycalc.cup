@@ -69,7 +69,7 @@ terminal           INT, BOOLEAN, VOID, LBRACE, RBRACE;
 terminal           Integer NUMBER;
 terminal           String ID;   
 
-non terminal     expr_list, expr_part;
+non terminal     Arbol expr_list, expr_part;
 non terminal     expr, prog, TIPO;
    
 
@@ -94,8 +94,8 @@ non terminal     expr, prog, TIPO;
 /* ----------------------------Grammar Section-------------------- */
    
 
-   prog   ::= TIPO MAIN LPAREN RPAREN LBRACE expr_list RBRACE
-	      {:RESULT = new Arbol(new Simbolo(Etiqueta.PROGRAMA),expr_list, expr_part); :}
+   prog   ::= TIPO MAIN LPAREN RPAREN LBRACE expr_list:e RBRACE
+	      {: RESULT = new Arbol(new Simbolo(Etiqueta.PROGRAMA),e, null); :}
             ;
    TIPO ::= INT {: RESULT = "int"; :}
             |
@@ -123,23 +123,24 @@ non terminal     expr, prog, TIPO;
 		 expr AND expr
 		 {:  :} 
                  |
-	         expr OR expr
-                 {:  :} 
+	         expr:e1 OR expr:e2
+                 {:   :} 
                  |
                  LPAREN expr RPAREN
                  {:  :} 
                  |
-		 TRUE
-		 {:  :} 
+		 TRUE:true
+		 {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,true,trueleft)); :} 
                  |		 
-		 FALSE
-		 {:  :} 
+		 FALSE:false
+		 {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,false,falseleft));  :} 
                  |
-                 NUMBER
-                 {:  :}                 
+                 NUMBER:num
+                 {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,num,numleft)); :}                 
                  |
-                 ID
-                 {:  :}
+                 ID:id
+                 {: System.out.println("id vale: "+id);
+RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); :}
                  ;
 
 
