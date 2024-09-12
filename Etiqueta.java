@@ -12,6 +12,7 @@ public enum Etiqueta {
      MULT,         // operacion multiplicacion
      VARIABLE,      // una variable
      VALORENTERO,   // una constante entera
-     VALORBOOLEANO // una constante booleana
-
+     VALORBOOLEANO, // una constante booleana
+     AND,           //OPERADOR LOGICO AND
+     OR,             //OPERADOR LOGICO OR
 }

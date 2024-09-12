@@ -70,7 +70,8 @@ terminal           Integer NUMBER;
 terminal           String ID;   
 
 non terminal     Arbol expr_list, expr_part;
-non terminal     expr, prog, TIPO;
+non terminal     Arbol expr, prog;
+non terminal     String TIPO;
    
 
 /* -------------Precedence and Associatively of Terminals Section----------- */
@@ -103,8 +104,8 @@ non terminal     expr, prog, TIPO;
             |
             VOID {: RESULT = "void"; :}
  	    ;
-   expr_list ::= expr_list expr_part
-                 | /* nada */
+   expr_list ::= expr_list expr_part {: RESULT = null; :}
+                 | /* nada */ {: RESULT = null; :}
                  ;
    
    expr_part ::= TIPO ID LPAREN RPAREN LBRACE expr_list RBRACE
@@ -114,49 +115,30 @@ non terminal     expr, prog, TIPO;
                  {: /*System.out.println(" FIN ");*/ :}
                  ;
    
-   expr      ::= expr PLUS expr
-		 {:  :}
-                 |
-                 expr TIMES expr
-      		 {:  :}   
-                 |
-		 expr AND expr
-		 {:  :} 
-                 |
-	         expr:e1 OR expr:e2
-                 {:   :} 
-                 |
-                 LPAREN expr RPAREN
-                 {:  :} 
-                 |
-		 TRUE:true
-		 {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,true,trueleft)); :} 
-                 |		 
-		 FALSE:false
-		 {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,false,falseleft));  :} 
-                 |
-                 NUMBER:num
-                 {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,num,numleft)); :}                 
-                 |
-                 ID:id
-                 {: System.out.println("id vale: "+id);
-RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); :}
-                 ;
-
-
-
-/* The grammar for our parser.EJEMPLOS
-   
-   expr_list ::=   expr_list expr_part
-                 | expr_part
-   expr_part ::=   expr SEMI
-   expr      ::=   expr PLUS factor
-                 | expr MINUS factor
-                 | factor
-   factor    ::=   factor TIMES term
-                 | factor DIVIDE term
-                 | term
-   term     ::=    LPAREN expr RPAREN
-                 | NUMBER
-                 | ID     
-*/
+   expr      ::= expr:e1 PLUS expr:e2
+		         {: RESULT = new Arbol(new Simbolo(Etiqueta.SUMA), e1, e2); :} 
+               |
+               expr:e1 TIMES expr:e2
+      		   {: RESULT = new Arbol(new Simbolo(Etiqueta.MULT), e1, e2); :}   
+               |
+		         expr:e1 AND expr:e2
+		         {: RESULT = new Arbol(new Simbolo(Etiqueta.AND), e1, e2); :}  
+               |
+	            expr:e1 OR expr:e2
+               {: RESULT = new Arbol(new Simbolo(Etiqueta.OR), e1, e2); :} 
+               |
+               LPAREN expr:e RPAREN
+               {: RESULT = e; :} 
+               |
+		         TRUE:verdad
+		         {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,1,verdadleft)); :}                 
+		         |		 
+		         FALSE:falso
+		         {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,0,falsoleft));  :} 
+               |
+               NUMBER:num
+               {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,num,numleft)); :}                 
+               |
+               ID:id
+               {: RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); :}
+               ;
