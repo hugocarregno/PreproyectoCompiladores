@@ -324,7 +324,7 @@ class Lexer implements java_cup.runtime.Scanner {
        the current token, the token will have no value in this
        case. */
     private Symbol symbol(int type) {
-        return new Symbol(type, yyline, yycolumn);
+        return new Symbol(type, yyline+1, yycolumn);
     }
     
     /* Also creates a new java_cup.runtime.Symbol with information
@@ -333,7 +333,7 @@ id.... idleft yyline     id value
 
 */
     private Symbol symbol(int type, Object value) {
-        return new Symbol(type, yyline, yycolumn, value);
+        return new Symbol(type, yyline+1, yycolumn, value);
     }
 
 
@@ -761,7 +761,8 @@ id.... idleft yyline     id value
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1:
-            { throw new Error("Illegal character <"+yytext()+">");
+            { System.out.println("Error in line " + (yyline) +", column "+ (yycolumn) +": Illegal character <"+yytext()+">");
+                          throw new Error("Error in line " + (yyline) +", column "+ (yycolumn) +": Illegal character <"+yytext()+">");
             }
           // fall through
           case 22: break;

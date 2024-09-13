@@ -55,8 +55,10 @@ parser code {:
        'message' and then exit.*/
     public void report_fatal_error(String message, Object info) {
         report_error(message, info);
-        System.exit(1);
+        System.exit(0);  // 1 return trace exception
     }
+    
+    TablaSimbolo tabla = new TablaSimbolo();
 :};
    
 
@@ -71,7 +73,7 @@ terminal           String ID;
 
 non terminal     Arbol expr_list, expr_part;
 non terminal     Arbol expr, prog;
-non terminal     String TIPO;
+non terminal     Tipos TIPO;
    
 
 /* -------------Precedence and Associatively of Terminals Section----------- */
@@ -98,21 +100,29 @@ non terminal     String TIPO;
    prog   ::= TIPO MAIN LPAREN RPAREN LBRACE expr_list:e RBRACE
 	      {: RESULT = new Arbol(new Simbolo(Etiqueta.PROGRAMA),e, null); :}
             ;
-   TIPO ::= INT {: RESULT = "int"; :}
+   TIPO ::= INT {: RESULT = Tipos.INT; :}
             |
-            BOOLEAN {: RESULT = "Boolean"; :}
+            BOOLEAN {: RESULT = Tipos.BOOL; :}
             |
-            VOID {: RESULT = "void"; :}
+            VOID {: RESULT = Tipos.NOTTYPE; :}
  	    ;
-   expr_list ::= expr_list expr_part {: RESULT = null; :}
-                 | /* nada */ {: RESULT = null; :}
+   expr_list ::= expr_list:el expr_part:ep {: RESULT = new Arbol(new Simbolo(Etiqueta.DECLS), el, ep); :}
+                 | expr_part:ep {: RESULT = ep; :}
                  ;
    
    expr_part ::= TIPO ID LPAREN RPAREN LBRACE expr_list RBRACE
-		| TIPO ID SEMI
-                | ID ASSIGN expr SEMI 
-		| RETURN expr SEMI
-                 {: /*System.out.println(" FIN ");*/ :}
+		| TIPO:t ID:id SEMI {: Simbolo simbolo = new Simbolo(Etiqueta.VARIABLE,id,t,0,idleft);
+				       RESULT = new Arbol(new Simbolo(Etiqueta.DECLARACION),new Arbol(simbolo),null);
+				    :}
+                | ID:id ASSIGN:a expr:e SEMI {: Simbolo simbolo = tabla.buscar(id); 
+                                              if (simbolo==null){ 
+                                                 report_fatal_error("Variable no declarada: "+id+" (Línea "+idleft+").\n",null);
+                                              } 
+                                              else{
+                                                 RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION),new Arbol(simbolo),e);  
+                                              }  
+                                           :}
+		| RETURN expr:e SEMI {: RESULT = new Arbol(new Simbolo(Etiqueta.RETURN),null,e); :}
                  ;
    
    expr      ::= expr:e1 PLUS expr:e2
@@ -140,5 +150,6 @@ non terminal     String TIPO;
                {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,num,numleft)); :}                 
                |
                ID:id
-               {: RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); :}
+               {: 
+                  RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); :}
                ;

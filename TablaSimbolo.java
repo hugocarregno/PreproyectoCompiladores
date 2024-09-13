@@ -16,7 +16,7 @@ public class TablaSimbolo {
          Iterator<Simbolo> it= tablaSimbolo.iterator();
              for(; it.hasNext();){
                 Simbolo a =it.next();
-                //Iteratator para recorrer una lista de elementos y para realizar esto dispone de hasNext que nos permite devolver si existe un siguiente elemento a la hora de iterar   
+                //Iterator para recorrer una lista de elementos y para realizar esto dispone de hasNext que nos permite devolver si existe un siguiente elemento a la hora de iterar   
                  if( a.getNombre().equals(nombre)){
                      return a;
                     

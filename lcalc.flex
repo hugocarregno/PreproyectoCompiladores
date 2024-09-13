@@ -46,7 +46,7 @@ import java_cup.runtime.*;
        the current token, the token will have no value in this
        case. */
     private Symbol symbol(int type) {
-        return new Symbol(type, yyline, yycolumn);
+        return new Symbol(type, yyline+1, yycolumn);
     }
     
     /* Also creates a new java_cup.runtime.Symbol with information
@@ -55,7 +55,7 @@ id.... idleft yyline     id value
 
 */
     private Symbol symbol(int type, Object value) {
-        return new Symbol(type, yyline, yycolumn, value);
+        return new Symbol(type, yyline+1, yycolumn, value);
     }
 %}
    
@@ -128,7 +128,7 @@ dec_int_id = [A-Za-z_][A-Za-z_0-9]*
        given to all identifiers. */
     {dec_int_id}       { System.out.print(yytext());
                          return symbol(sym.ID, new String(yytext()));}
-   
+
     /* Don't do anything if whitespace is found */
     {WhiteSpace}       { /* just skip what was found, do nothing */ }   
 }
@@ -136,7 +136,10 @@ dec_int_id = [A-Za-z_][A-Za-z_0-9]*
 "//".*			{ /* just skip what was found, do nothing */ } 
 /* No token was found for the input so through an error.  Print out an
    Illegal character message with the illegal character that was found. */
-[^]                    { throw new Error("Illegal character <"+yytext()+">"); }
+[^]                    { 
+                          System.out.println("Error in line " + (yyline) +", column "+ (yycolumn) +": Illegal character <"+yytext()+">");
+                          throw new Error("Error in line " + (yyline) +", column "+ (yycolumn) +": Illegal character <"+yytext()+">"); 
+			}
 
    
 
