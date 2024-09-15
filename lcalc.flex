@@ -120,14 +120,14 @@ dec_int_id = [A-Za-z_][A-Za-z_0-9]*
        that represents an integer and the value of the integer that is
        held in the string yytext which will get turned into an integer
        before returning */
-    {dec_int_lit}      { System.out.print(yytext());
+    {dec_int_lit}      { //System.out.print(yytext());
                          return symbol(sym.NUMBER, new Integer(yytext())); }
    
     /* If an identifier is found print it out, return the token ID
        that represents an identifier and the default value one that is
        given to all identifiers. */
-    {dec_int_id}       { System.out.print(yytext());
-                         return symbol(sym.ID, new String(yytext()));}
+    {dec_int_id}       { //System.out.print(yytext());
+                         return symbol(sym.ID, new String(yytext())); }
 
     /* Don't do anything if whitespace is found */
     {WhiteSpace}       { /* just skip what was found, do nothing */ }   
@@ -137,7 +137,7 @@ dec_int_id = [A-Za-z_][A-Za-z_0-9]*
 /* No token was found for the input so through an error.  Print out an
    Illegal character message with the illegal character that was found. */
 [^]                    { 
-                          System.out.println("Error in line " + (yyline) +", column "+ (yycolumn) +": Illegal character <"+yytext()+">");
+                          //System.out.println("Error in line " + (yyline) +", column "+ (yycolumn) +": Illegal character <"+yytext()+">");
                           throw new Error("Error in line " + (yyline) +", column "+ (yycolumn) +": Illegal character <"+yytext()+">"); 
 			}
 

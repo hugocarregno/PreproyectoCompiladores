@@ -1,3 +1,7 @@
-void main() {int x; int y; x = 1 ; y=1; x = x+3*2*y; }
+void main() {int x;
+int y;
+x = 1 ;
+y=1;
+x = x+3*2*y; }
 //void main() { int x; x = 6; return x; }
 //int main() {int x; int y; x = 1 ; x = x+3*2*y; return x; y = 4; x = 2; return y*2;}

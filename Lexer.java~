@@ -761,7 +761,7 @@ id.... idleft yyline     id value
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1:
-            { System.out.println("Error in line " + (yyline) +", column "+ (yycolumn) +": Illegal character <"+yytext()+">");
+            { //System.out.println("Error in line " + (yyline) +", column "+ (yycolumn) +": Illegal character <"+yytext()+">");
                           throw new Error("Error in line " + (yyline) +", column "+ (yycolumn) +": Illegal character <"+yytext()+">");
             }
           // fall through
@@ -792,7 +792,7 @@ id.... idleft yyline     id value
           // fall through
           case 27: break;
           case 7:
-            { System.out.print(yytext());
+            { //System.out.print(yytext());
                          return symbol(sym.NUMBER, new Integer(yytext()));
             }
           // fall through
@@ -808,7 +808,7 @@ id.... idleft yyline     id value
           // fall through
           case 30: break;
           case 10:
-            { System.out.print(yytext());
+            { //System.out.print(yytext());
                          return symbol(sym.ID, new String(yytext()));
             }
           // fall through

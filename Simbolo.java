@@ -1,4 +1,3 @@
-
 // Información de un simbolo interviniente en el programa
 
 public class Simbolo {
@@ -8,8 +7,9 @@ public class Simbolo {
    private Tipos tipo;  // tipo del simbolo (int o boolean)
    private int valor;     //  valor asociado al simbolo (para int es un numero; para bool es true=0 y false=1
    private int nrolinea;
+
 // constructores
-        public Simbolo(Etiqueta flag) {
+    public Simbolo(Etiqueta flag) {
         this.flag = flag;
         this.nombre = "";
         this.tipo = Tipos.NOTTYPE;
@@ -62,5 +62,6 @@ public class Simbolo {
 
     public String toString(){
 	    return "("+this.getEtiqueta()+" , "+this.getNombre()+" , "+this.getTipo()+" , "+this.getValor()+" , "+this.getNroLinea()+")\n";
-	} 
+	}     
+    
 }

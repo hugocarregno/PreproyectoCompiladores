@@ -10,56 +10,26 @@
 import java_cup.runtime.*;
    
 parser code {:
-    
+    //TablaSimbolo tabla = new TablaSimbolo();
+
+    // Método para reportar errores
     public void report_error(String message, Object info) {
-   
-        /* Create a StringBuffer called 'm' with the string 'Error' in it. */
         StringBuffer m = new StringBuffer("Error");
-   
-        /* Check if the information passed to the method is the same
-           type as the type java_cup.runtime.Symbol. */
         if (info instanceof java_cup.runtime.Symbol) {
-            /* Declare a java_cup.runtime.Symbol object 's' with the
-               information in the object info that is being typecasted
-               as a java_cup.runtime.Symbol object. */
-            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
-   
-            /* Check if the line number in the input is greater or
-               equal to zero. */
-            if (s.left >= 0) {                
-                /* Add to the end of the StringBuffer error message
-                   the line number of the error in the input. */
-                m.append(" in line "+(s.left+1));   
-                /* Check if the column number in the input is greater
-                   or equal to zero. */
-                if (s.right >= 0)                    
-                    /* Add to the end of the StringBuffer error message
-                       the column number of the error in the input. */
-                    m.append(", column "+(s.right+1));
-            }
+            java_cup.runtime.Symbol s = (java_cup.runtime.Symbol) info;
+            if (s.left >= 0) m.append(" in line " + (s.left + 1));
+            if (s.right >= 0) m.append(", column " + (s.right + 1));
         }
-   
-        /* Add to the end of the StringBuffer error message created in
-           this method the message that was passed into this method. */
-        m.append(" : "+message);
-   
-        /* Print the contents of the StringBuffer 'm', which contains
-           an error message, out on a line. */
+        m.append(" : " + message);
         System.err.println(m);
     }
-   
-    /* Change the method report_fatal_error so when it reports a fatal
-       error it will display the line and column number of where the
-       fatal error occurred in the input as well as the reason for the
-       fatal error which is passed into the method in the object
-       'message' and then exit.*/
+
     public void report_fatal_error(String message, Object info) {
         report_error(message, info);
-        System.exit(0);  // 1 return trace exception
+        System.exit(1);  // Terminar la ejecución
     }
-    
-    TablaSimbolo tabla = new TablaSimbolo();
 :};
+
    
 
    
@@ -98,7 +68,7 @@ non terminal     Tipos TIPO;
    
 
    prog   ::= TIPO MAIN LPAREN RPAREN LBRACE expr_list:e RBRACE
-	      {: RESULT = new Arbol(new Simbolo(Etiqueta.PROGRAMA),e, null); :}
+	        {: RESULT = new Arbol(new Simbolo(Etiqueta.PROGRAMA),e, null); :}
             ;
    TIPO ::= INT {: RESULT = Tipos.INT; :}
             |
@@ -110,46 +80,44 @@ non terminal     Tipos TIPO;
                  | expr_part:ep {: RESULT = ep; :}
                  ;
    
-   expr_part ::= TIPO ID LPAREN RPAREN LBRACE expr_list RBRACE
-		| TIPO:t ID:id SEMI {: Simbolo simbolo = new Simbolo(Etiqueta.VARIABLE,id,t,0,idleft);
-				       RESULT = new Arbol(new Simbolo(Etiqueta.DECLARACION),new Arbol(simbolo),null);
-				    :}
-                | ID:id ASSIGN:a expr:e SEMI {: Simbolo simbolo = tabla.buscar(id); 
-                                              if (simbolo==null){ 
-                                                 report_fatal_error("Variable no declarada: "+id+" (Línea "+idleft+").\n",null);
-                                              } 
-                                              else{
-                                                 RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION),new Arbol(simbolo),e);  
-                                              }  
-                                           :}
-		| RETURN expr:e SEMI {: RESULT = new Arbol(new Simbolo(Etiqueta.RETURN),null,e); :}
+   expr_part ::= TIPO:t ID:id SEMI 
+              {: Simbolo simbolo = new Simbolo(Etiqueta.VARIABLE, id, t, 0, idleft);
+                 Simbolo resultado = new TablaSimbolo().insertar(simbolo);
+                 if (resultado == null) {
+                  report_fatal_error("Variable ya declarada: " + id + " (Línea " + idleft + ").\n", null);
+                 }
+                  RESULT = new Arbol(new Simbolo(Etiqueta.DECLARACION), new Arbol(simbolo), null);
+                 
+				      :}
+                | ID:id ASSIGN:a expr:e SEMI 
+              {: Simbolo simbolo = new TablaSimbolo().buscar(id); 
+                 if (simbolo==null){ 
+                  report_fatal_error("Variable no declarada: " + id + " (Línea " + idleft + ").\n", null);                                                
+                 } 
+                 else{
+                  RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION),new Arbol(simbolo),e);  
+                 }  
+              :}
+		            | RETURN expr:e SEMI 
+              {: RESULT = new Arbol(new Simbolo(Etiqueta.RETURN),null,e); :}
                  ;
    
    expr      ::= expr:e1 PLUS expr:e2
-		         {: RESULT = new Arbol(new Simbolo(Etiqueta.SUMA), e1, e2); :} 
-               |
-               expr:e1 TIMES expr:e2
-      		   {: RESULT = new Arbol(new Simbolo(Etiqueta.MULT), e1, e2); :}   
-               |
-		         expr:e1 AND expr:e2
-		         {: RESULT = new Arbol(new Simbolo(Etiqueta.AND), e1, e2); :}  
-               |
-	            expr:e1 OR expr:e2
-               {: RESULT = new Arbol(new Simbolo(Etiqueta.OR), e1, e2); :} 
-               |
-               LPAREN expr:e RPAREN
-               {: RESULT = e; :} 
-               |
-		         TRUE:verdad
-		         {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,1,verdadleft)); :}                 
-		         |		 
-		         FALSE:falso
-		         {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,0,falsoleft));  :} 
-               |
-               NUMBER:num
-               {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,num,numleft)); :}                 
-               |
-               ID:id
-               {: 
-                  RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); :}
+	     {: RESULT = new Arbol(new Simbolo(Etiqueta.SUMA), e1, e2); :} 
+               | expr:e1 TIMES expr:e2
+      	     {: RESULT = new Arbol(new Simbolo(Etiqueta.MULT), e1, e2); :}   
+               | expr:e1 AND expr:e2
+	     {: RESULT = new Arbol(new Simbolo(Etiqueta.AND), e1, e2); :}  
+               | expr:e1 OR expr:e2
+             {: RESULT = new Arbol(new Simbolo(Etiqueta.OR), e1, e2); :} 
+               | LPAREN expr:e RPAREN
+             {: RESULT = e; :} 
+               | TRUE:verdad
+	     {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,1,verdadleft)); :}                 
+	       | FALSE:falso
+	     {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,0,falsoleft));  :} 
+               | NUMBER:num
+             {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,num,numleft)); :}                 
+               | ID:id
+             {: RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); :}
                ;
