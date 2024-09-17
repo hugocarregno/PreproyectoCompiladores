@@ -8,9 +8,10 @@
 /* ----------------------Preliminary Declarations Section--------------------*/
    
 import java_cup.runtime.*;
+import java.util.*;
    
 parser code {:
-    //TablaSimbolo tabla = new TablaSimbolo();
+    public static TablaSimbolo tabla = new TablaSimbolo();
 
     // Método para reportar errores
     public void report_error(String message, Object info) {
@@ -68,7 +69,9 @@ non terminal     Tipos TIPO;
    
 
    prog   ::= TIPO MAIN LPAREN RPAREN LBRACE expr_list:e RBRACE
-	        {: RESULT = new Arbol(new Simbolo(Etiqueta.PROGRAMA),e, null); :}
+	        {: 
+		System.out.println(parser.tabla.toString()); /* incluir esto aca se muestra la tabla pero luego sacar esta linea*/
+		RESULT = new Arbol(new Simbolo(Etiqueta.PROGRAMA),e, null); :}
             ;
    TIPO ::= INT {: RESULT = Tipos.INT; :}
             |
@@ -82,17 +85,17 @@ non terminal     Tipos TIPO;
    
    expr_part ::= TIPO:t ID:id SEMI 
               {: Simbolo simbolo = new Simbolo(Etiqueta.VARIABLE, id, t, 0, idleft);
-                 Simbolo resultado = new TablaSimbolo().insertar(simbolo);
+                 Simbolo resultado = parser.tabla.insertar(simbolo);
                  if (resultado == null) {
-                  report_fatal_error("Variable ya declarada: " + id + " (Línea " + idleft + ").\n", null);
+                  parser.report_fatal_error("Variable ya declarada: " + id + " (Línea " + idleft + ").\n", null);
                  }
                   RESULT = new Arbol(new Simbolo(Etiqueta.DECLARACION), new Arbol(simbolo), null);
                  
 				      :}
-                | ID:id ASSIGN:a expr:e SEMI 
-              {: Simbolo simbolo = new TablaSimbolo().buscar(id); 
+                | ID:id ASSIGN expr:e SEMI 
+              {: Simbolo simbolo = parser.tabla.buscar(id); 
                  if (simbolo==null){ 
-                  report_fatal_error("Variable no declarada: " + id + " (Línea " + idleft + ").\n", null);                                                
+                  parser.report_fatal_error("Variable no declarada: " + id + " (Línea " + idleft + ").\n", null);                                                
                  } 
                  else{
                   RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION),new Arbol(simbolo),e);  
@@ -119,5 +122,14 @@ non terminal     Tipos TIPO;
                | NUMBER:num
              {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,num,numleft)); :}                 
                | ID:id
-             {: RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); :}
+             {: 
+                Simbolo simbolo = parser.tabla.buscar(id); 
+                 if (simbolo==null){ 
+                  parser.report_fatal_error("Variable no declarada: " + id + " (Linea " + idleft + ").\n", null);                                                
+                 } 
+                 else{ 
+		   RESULT = new Arbol(simbolo);
+//RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); 
+}
+:}
                ;

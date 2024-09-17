@@ -46,7 +46,7 @@ import java_cup.runtime.*;
        the current token, the token will have no value in this
        case. */
     private Symbol symbol(int type) {
-        return new Symbol(type, yyline+1, yycolumn);
+        return new Symbol(type, yyline, yycolumn);
     }
     
     /* Also creates a new java_cup.runtime.Symbol with information
@@ -55,7 +55,7 @@ id.... idleft yyline     id value
 
 */
     private Symbol symbol(int type, Object value) {
-        return new Symbol(type, yyline+1, yycolumn, value);
+        return new Symbol(type, yyline, yycolumn, value);
     }
 %}
    
@@ -120,13 +120,13 @@ dec_int_id = [A-Za-z_][A-Za-z_0-9]*
        that represents an integer and the value of the integer that is
        held in the string yytext which will get turned into an integer
        before returning */
-    {dec_int_lit}      { //System.out.print(yytext());
+    {dec_int_lit}      { System.out.println(yytext());
                          return symbol(sym.NUMBER, new Integer(yytext())); }
    
     /* If an identifier is found print it out, return the token ID
        that represents an identifier and the default value one that is
        given to all identifiers. */
-    {dec_int_id}       { //System.out.print(yytext());
+    {dec_int_id}       { System.out.println(yytext());
                          return symbol(sym.ID, new String(yytext())); }
 
     /* Don't do anything if whitespace is found */

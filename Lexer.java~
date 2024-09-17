@@ -324,7 +324,7 @@ class Lexer implements java_cup.runtime.Scanner {
        the current token, the token will have no value in this
        case. */
     private Symbol symbol(int type) {
-        return new Symbol(type, yyline+1, yycolumn);
+        return new Symbol(type, yyline, yycolumn);
     }
     
     /* Also creates a new java_cup.runtime.Symbol with information
@@ -333,7 +333,7 @@ id.... idleft yyline     id value
 
 */
     private Symbol symbol(int type, Object value) {
-        return new Symbol(type, yyline+1, yycolumn, value);
+        return new Symbol(type, yyline, yycolumn, value);
     }
 
 
@@ -792,7 +792,7 @@ id.... idleft yyline     id value
           // fall through
           case 27: break;
           case 7:
-            { //System.out.print(yytext());
+            { System.out.println(yytext());
                          return symbol(sym.NUMBER, new Integer(yytext()));
             }
           // fall through
@@ -808,7 +808,7 @@ id.... idleft yyline     id value
           // fall through
           case 30: break;
           case 10:
-            { //System.out.print(yytext());
+            { System.out.println(yytext());
                          return symbol(sym.ID, new String(yytext()));
             }
           // fall through
