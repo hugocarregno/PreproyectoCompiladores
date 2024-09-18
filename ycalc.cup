@@ -70,7 +70,6 @@ non terminal     Tipos TIPO;
 
    prog   ::= TIPO MAIN LPAREN RPAREN LBRACE expr_list:e RBRACE
 	        {: 
-		System.out.println(parser.tabla.toString()); /* incluir esto aca se muestra la tabla pero luego sacar esta linea*/
 		RESULT = new Arbol(new Simbolo(Etiqueta.PROGRAMA),e, null); :}
             ;
    TIPO ::= INT {: RESULT = Tipos.INT; :}
@@ -97,22 +96,51 @@ non terminal     Tipos TIPO;
                  if (simbolo==null){ 
                   parser.report_fatal_error("Variable no declarada: " + id + " (Línea " + idleft + ").\n", null);                                                
                  } 
-                 else{
-                  RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION),new Arbol(simbolo),e);  
-                 }  
-              :}
+                 else {
+        
+        Tipos tipoExpresion = e.getInfo().getTipo();
+        if (simbolo.getTipo() == Tipos.NOTTYPE) {
+            parser.tabla.actualizarTipo(id, tipoExpresion);
+            simbolo.setTipo(tipoExpresion);
+        } else if (simbolo.getTipo() != tipoExpresion) {
+            parser.report_fatal_error("Tipos incompatibles en la asignación: variable " + id + " es de tipo " + simbolo.getTipo() + " pero se le asigna un valor de tipo " + tipoExpresion + ".\n", null);
+        }
+RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION), new Arbol(simbolo), e); 
+}              :}
 		            | RETURN expr:e SEMI 
               {: RESULT = new Arbol(new Simbolo(Etiqueta.RETURN),null,e); :}
                  ;
    
    expr      ::= expr:e1 PLUS expr:e2
-	     {: RESULT = new Arbol(new Simbolo(Etiqueta.SUMA), e1, e2); :} 
+	     {: if (e1.getInfo().getTipo() != Tipos.INT || e2.getInfo().getTipo() != Tipos.INT) {
+         parser.report_fatal_error("Tipos incompatibles en suma (se esperaba INT): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
+     }
+		RESULT = new Arbol(new Simbolo(Etiqueta.SUMA), e1, e2); 
+		//RESULT.tipo = Tipos.INT;
+:} 
                | expr:e1 TIMES expr:e2
-      	     {: RESULT = new Arbol(new Simbolo(Etiqueta.MULT), e1, e2); :}   
+      	     {: if (e1.getInfo().getTipo() != Tipos.INT || e2.getInfo().getTipo() != Tipos.INT) {
+         parser.report_fatal_error("Tipos incompatibles en multiplicación (se esperaba INT): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
+     }
+RESULT = new Arbol(new Simbolo(Etiqueta.MULT), e1, e2);
+//RESULT.tipo = Tipos.INT;
+ :}   
                | expr:e1 AND expr:e2
-	     {: RESULT = new Arbol(new Simbolo(Etiqueta.AND), e1, e2); :}  
+	     {: 
+if (e1.getInfo().getTipo() != Tipos.BOOL || e2.getInfo().getTipo() != Tipos.BOOL) {
+         parser.report_fatal_error("Tipos incompatibles en AND (se esperaba BOOLEAN): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
+     }
+RESULT = new Arbol(new Simbolo(Etiqueta.AND), e1, e2);
+//RESULT.tipo = Tipos.BOOL;
+ :}  
                | expr:e1 OR expr:e2
-             {: RESULT = new Arbol(new Simbolo(Etiqueta.OR), e1, e2); :} 
+             {: 
+if (e1.getInfo().getTipo() != Tipos.BOOL || e2.getInfo().getTipo() != Tipos.BOOL) {
+         parser.report_fatal_error("Tipos incompatibles en OR (se esperaba BOOLEAN): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
+     }
+RESULT = new Arbol(new Simbolo(Etiqueta.OR), e1, e2);
+//RESULT.tipo = Tipos.BOOL;
+ :} 
                | LPAREN expr:e RPAREN
              {: RESULT = e; :} 
                | TRUE:verdad
@@ -120,7 +148,9 @@ non terminal     Tipos TIPO;
 	       | FALSE:falso
 	     {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORBOOLEANO,"",Tipos.BOOL,0,falsoleft));  :} 
                | NUMBER:num
-             {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,num,numleft)); :}                 
+             {: RESULT = new Arbol(new Simbolo(Etiqueta.VALORENTERO,"",Tipos.INT,num,numleft));
+		//RESULT.TIPO = Tipos.INT;
+ :}                 
                | ID:id
              {: 
                 Simbolo simbolo = parser.tabla.buscar(id); 
@@ -128,8 +158,8 @@ non terminal     Tipos TIPO;
                   parser.report_fatal_error("Variable no declarada: " + id + " (Linea " + idleft + ").\n", null);                                                
                  } 
                  else{ 
-		   RESULT = new Arbol(simbolo);
-//RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); 
+		   //RESULT = new Arbol(simbolo);
+RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); 
 }
 :}
                ;

@@ -32,6 +32,16 @@ public class TablaSimbolo {
          }else 
              return null; // existe entonces retorna null para informar que no pudo insertar
      }
+
+      // Método para actualizar el tipo de un símbolo existente
+    public boolean actualizarTipo(String nombre, Tipos nuevoTipo) {
+        Simbolo simbolo = this.buscar(nombre);
+        if (simbolo != null) {
+            simbolo.setTipo(nuevoTipo);
+            return true;
+        }
+        return false;
+    }
      
      public String toString(){
 		  String result = ""; 
