@@ -111,35 +111,33 @@ RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION), new Arbol(simbolo), e);
               {: RESULT = new Arbol(new Simbolo(Etiqueta.RETURN),null,e); :}
                  ;
    
-   expr      ::= expr:e1 PLUS expr:e2
+   expr      ::= expr:e1 PLUS:p expr:e2
 	     {: if (e1.getInfo().getTipo() != Tipos.INT || e2.getInfo().getTipo() != Tipos.INT) {
          parser.report_fatal_error("Tipos incompatibles en suma (se esperaba INT): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
      }
-		RESULT = new Arbol(new Simbolo(Etiqueta.SUMA), e1, e2); 
-		//RESULT.tipo = Tipos.INT;
+		RESULT = new Arbol(new Simbolo(Etiqueta.SUMA,"+",Tipos.INT,0,pleft), e1, e2);
 :} 
-               | expr:e1 TIMES expr:e2
+               | expr:e1 TIMES:t expr:e2
       	     {: if (e1.getInfo().getTipo() != Tipos.INT || e2.getInfo().getTipo() != Tipos.INT) {
          parser.report_fatal_error("Tipos incompatibles en multiplicación (se esperaba INT): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
      }
-RESULT = new Arbol(new Simbolo(Etiqueta.MULT), e1, e2);
-//RESULT.tipo = Tipos.INT;
+
+RESULT = new Arbol(new Simbolo(Etiqueta.MULT,"*",Tipos.INT,0,tleft), e1, e2);
+
  :}   
-               | expr:e1 AND expr:e2
+               | expr:e1 AND:a expr:e2
 	     {: 
 if (e1.getInfo().getTipo() != Tipos.BOOL || e2.getInfo().getTipo() != Tipos.BOOL) {
          parser.report_fatal_error("Tipos incompatibles en AND (se esperaba BOOLEAN): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
      }
-RESULT = new Arbol(new Simbolo(Etiqueta.AND), e1, e2);
-//RESULT.tipo = Tipos.BOOL;
+RESULT = new Arbol(new Simbolo(Etiqueta.AND,"&&",Tipos.BOOL,0,aleft), e1, e2);
  :}  
-               | expr:e1 OR expr:e2
+               | expr:e1 OR:o expr:e2
              {: 
 if (e1.getInfo().getTipo() != Tipos.BOOL || e2.getInfo().getTipo() != Tipos.BOOL) {
          parser.report_fatal_error("Tipos incompatibles en OR (se esperaba BOOLEAN): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
      }
-RESULT = new Arbol(new Simbolo(Etiqueta.OR), e1, e2);
-//RESULT.tipo = Tipos.BOOL;
+RESULT = new Arbol(new Simbolo(Etiqueta.OR,"||",Tipos.BOOL,0,oleft), e1, e2);
  :} 
                | LPAREN expr:e RPAREN
              {: RESULT = e; :} 
@@ -158,8 +156,8 @@ RESULT = new Arbol(new Simbolo(Etiqueta.OR), e1, e2);
                   parser.report_fatal_error("Variable no declarada: " + id + " (Linea " + idleft + ").\n", null);                                                
                  } 
                  else{ 
-		   //RESULT = new Arbol(simbolo);
-RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); 
+		   RESULT = new Arbol(simbolo);
+//RESULT = new Arbol(new Simbolo(Etiqueta.VARIABLE,id,Tipos.NOTTYPE,0,idleft)); 
 }
 :}
                ;
