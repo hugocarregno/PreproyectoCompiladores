@@ -106,7 +106,7 @@ non terminal     Tipos TIPO;
             parser.report_fatal_error("Tipos incompatibles en la asignación: variable " + id + " es de tipo " + simbolo.getTipo() + " pero se le asigna un valor de tipo " + tipoExpresion + ".\n", null);
         }
         simbolo.setValor(e.getInfo().getValor());
-RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION), new Arbol(simbolo), e); 
+        RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION), new Arbol(simbolo), e); 
 }              :}
 		            | RETURN expr:e SEMI 
               {: System.out.println("resultado:"+e.getInfo().getValor());
@@ -121,14 +121,17 @@ RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION), new Arbol(simbolo), e);
 	     {: if (e1.getInfo().getTipo() != Tipos.INT || e2.getInfo().getTipo() != Tipos.INT) {
          parser.report_fatal_error("Tipos incompatibles en suma (se esperaba INT): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
      }
-		RESULT = new Arbol(new Simbolo(Etiqueta.SUMA,"+",Tipos.INT,e1.getInfo().getValor()+e2.getInfo().getValor(),pleft), e1, e2);
+    Simbolo temp = new Simbolo(Etiqueta.SUMA,"+",Tipos.INT,e1.getInfo().getValor()+e2.getInfo().getValor(),pleft);
+    parser.lista3d.add(new Codigo3D(Etiqueta.SUMA,e1.getInfo(),e2.getInfo(),temp));
+		RESULT = new Arbol(temp, e1, e2);
 :} 
                | expr:e1 TIMES:t expr:e2
       	     {: if (e1.getInfo().getTipo() != Tipos.INT || e2.getInfo().getTipo() != Tipos.INT) {
          parser.report_fatal_error("Tipos incompatibles en multiplicación (se esperaba INT): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
      }
-
-RESULT = new Arbol(new Simbolo(Etiqueta.MULT,"*",Tipos.INT,e1.getInfo().getValor()*e2.getInfo().getValor(),tleft), e1, e2);
+Simbolo temp = new Simbolo(Etiqueta.MULT,"*",Tipos.INT,e1.getInfo().getValor()*e2.getInfo().getValor(),tleft);
+      parser.lista3d.add(new Codigo3D(Etiqueta.MULT,e1.getInfo(),e2.getInfo(),temp));
+RESULT = new Arbol(temp, e1, e2);
 
  :}   
                | expr:e1 AND:a expr:e2
@@ -136,7 +139,9 @@ RESULT = new Arbol(new Simbolo(Etiqueta.MULT,"*",Tipos.INT,e1.getInfo().getValor
 if (e1.getInfo().getTipo() != Tipos.BOOL || e2.getInfo().getTipo() != Tipos.BOOL) {
          parser.report_fatal_error("Tipos incompatibles en AND (se esperaba BOOLEAN): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
      }
-RESULT = new Arbol(new Simbolo(Etiqueta.AND,"&&",Tipos.BOOL,e1.getInfo().getValor() * e2.getInfo().getValor() ==1 ? 1 : 0 ,aleft), e1, e2);
+     Simbolo temp = new Simbolo(Etiqueta.AND,"&&",Tipos.BOOL,e1.getInfo().getValor() * e2.getInfo().getValor() ==1 ? 1 : 0 ,aleft);
+      parser.lista3d.add(new Codigo3D(Etiqueta.AND,e1.getInfo(),e2.getInfo(),temp));
+RESULT = new Arbol(temp, e1, e2);
  :}  
                | expr:e1 OR:o expr:e2
              {: 

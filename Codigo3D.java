@@ -10,4 +10,5 @@ class Codigo3D{
         this.op2 = op2;
         this.res = res;
     }
+   
 }
