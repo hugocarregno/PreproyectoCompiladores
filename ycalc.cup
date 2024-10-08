@@ -86,9 +86,7 @@ non terminal     Tipos TIPO;
             VOID {: RESULT = Tipos.NOTTYPE; :}
  	    ;
    expr_list ::= expr_list:el expr_part:ep {: 
-                  Simbolo temp = new Simbolo(Etiqueta.DECLS);
-                  parser.lista3d.add(new Codigo3D(Etiqueta.DECLS,el.getInfo(),ep.getInfo(),temp));
-                  RESULT = new Arbol(temp, el, ep); :}
+                  RESULT = new Arbol(new Simbolo(Etiqueta.DECLS), el, ep); :}
                  | expr_part:ep {: RESULT = ep; :}
                  ;
    

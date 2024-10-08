@@ -1,5 +1,6 @@
 //void main() {int x; int y; x = 1; y=1; x = x+3+2*y; }
 //void main() { int x; x = 6; return x; }
 //void main(){ int x; boolean y; x=2; y=false; }
-void main(){boolean x; boolean y; x=true; y=false; x=x && y; return x; return true; return y; return; }
+//void main(){boolean x; boolean y; x=true; y=false; x=x && y; return x; return true; return y; return; }
 //int main() {int x; int y; x = 1 ; x = x*3*2*y; return x; y = 4; x = 2; return y*2;}
+int main(){ int y; int x; x=1+2; y=3; return x+y;}
