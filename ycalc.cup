@@ -70,6 +70,11 @@ non terminal     Tipos TIPO;
 
    prog   ::= TIPO MAIN LPAREN RPAREN LBRACE expr_list:e RBRACE
 	        {: 
+          System.out.println("Tabla de Simbolos\n"+parser.tabla);
+          System.out.println("PseudoAssembler");
+          for(Codigo3D secuencia: parser.lista3d){
+            System.out.println(secuencia);
+          }
     Simbolo temp = new Simbolo(Etiqueta.PROGRAMA);
     parser.lista3d.add(new Codigo3D(Etiqueta.PROGRAMA,e.getInfo(),null,temp));
 		RESULT = new Arbol(temp,e, null); :}
@@ -185,5 +190,7 @@ RESULT = new Arbol(temp, e1, e2);
                  else{ 
 		   RESULT = new Arbol(simbolo); 
 }
+
+
 :}
                ;
