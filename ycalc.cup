@@ -70,7 +70,9 @@ non terminal     Tipos TIPO;
 
    prog   ::= TIPO MAIN LPAREN RPAREN LBRACE expr_list:e RBRACE
 	        {: 
-		RESULT = new Arbol(new Simbolo(Etiqueta.PROGRAMA),e, null); :}
+    Simbolo temp = new Simbolo(Etiqueta.PROGRAMA);
+    parser.lista3d.add(new Codigo3D(Etiqueta.PROGRAMA,e.getInfo(),null,temp));
+		RESULT = new Arbol(temp,e, null); :}
             ;
    TIPO ::= INT {: RESULT = Tipos.INT; :}
             |
@@ -78,7 +80,10 @@ non terminal     Tipos TIPO;
             |
             VOID {: RESULT = Tipos.NOTTYPE; :}
  	    ;
-   expr_list ::= expr_list:el expr_part:ep {: RESULT = new Arbol(new Simbolo(Etiqueta.DECLS), el, ep); :}
+   expr_list ::= expr_list:el expr_part:ep {: 
+                  Simbolo temp = new Simbolo(Etiqueta.DECLS);
+                  parser.lista3d.add(new Codigo3D(Etiqueta.DECLS,el.getInfo(),ep.getInfo(),temp));
+                  RESULT = new Arbol(temp, el, ep); :}
                  | expr_part:ep {: RESULT = ep; :}
                  ;
    
@@ -88,7 +93,9 @@ non terminal     Tipos TIPO;
                  if (resultado == null) {
                   parser.report_fatal_error("Variable ya declarada: " + id + " (Línea " + idleft + ").\n", null);
                  }
-                  RESULT = new Arbol(new Simbolo(Etiqueta.DECLARACION), new Arbol(simbolo), null);
+                  Simbolo temp = new Simbolo(Etiqueta.DECLARACION);
+                  parser.lista3d.add(new Codigo3D(Etiqueta.DECLARACION,new Arbol(simbolo).getInfo(),null,temp));
+                  RESULT = new Arbol(temp, new Arbol(simbolo), null);
                  
 				      :}
                 | ID:id ASSIGN expr:e SEMI 
@@ -106,14 +113,20 @@ non terminal     Tipos TIPO;
             parser.report_fatal_error("Tipos incompatibles en la asignación: variable " + id + " es de tipo " + simbolo.getTipo() + " pero se le asigna un valor de tipo " + tipoExpresion + ".\n", null);
         }
         simbolo.setValor(e.getInfo().getValor());
-        RESULT = new Arbol(new Simbolo(Etiqueta.ASIGNACION), new Arbol(simbolo), e); 
+        Simbolo temp = new Simbolo(Etiqueta.ASIGNACION);
+        parser.lista3d.add(new Codigo3D(Etiqueta.ASIGNACION,new Arbol(simbolo).getInfo(),e.getInfo(),temp));
+        RESULT = new Arbol(temp, new Arbol(simbolo), e); 
 }              :}
 		            | RETURN expr:e SEMI 
               {: System.out.println("resultado:"+e.getInfo().getValor());
-              RESULT = new Arbol(new Simbolo(Etiqueta.RETURN),null,e); :}
+              Simbolo temp = new Simbolo(Etiqueta.RETURN);
+              parser.lista3d.add(new Codigo3D(Etiqueta.RETURN,null,e.getInfo(),temp));
+              RESULT = new Arbol(temp,null,e); :}
                  | RETURN SEMI 
               {: 
-              RESULT = new Arbol(new Simbolo(Etiqueta.RETURN),null,null); :}
+              Simbolo temp = new Simbolo(Etiqueta.RETURN);
+              parser.lista3d.add(new Codigo3D(Etiqueta.RETURN,null,null,temp));
+              RESULT = new Arbol(temp,null,null); :}
                  ;
 
    
