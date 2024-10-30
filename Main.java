@@ -18,7 +18,7 @@ public class Main {
       parser p = new parser(new Lexer(new FileReader(argv[0])));
       Object result = p.parse().value;      
       System.out.println("Parser finished successfully.");
-      
+      GeneradorAssembler.generar(parser.lista3d);
     } catch (Exception e) {
       /* do cleanup here -- possibly rethrow e */
       e.printStackTrace();

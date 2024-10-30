@@ -13,6 +13,7 @@ import java.util.*;
 parser code {:
     public static TablaSimbolo tabla = new TablaSimbolo();
     public static ArrayList<Codigo3D> lista3d = new ArrayList<Codigo3D>();
+    public static ArrayList<String> lineasCodigo = new ArrayList<>();
     // Método para reportar errores
     public void report_error(String message, Object info) {
         StringBuffer m = new StringBuffer("Error");
@@ -117,17 +118,23 @@ non terminal     Tipos TIPO;
         }
         simbolo.setValor(e.getInfo().getValor());
         Simbolo temp = new Simbolo(Etiqueta.ASIGNACION);
+
+        parser.lineasCodigo.add(Codigo3D.generarLinea(Etiqueta.ASIGNACION,new Arbol(simbolo).getInfo(),e.getInfo(),temp));
         parser.lista3d.add(new Codigo3D(Etiqueta.ASIGNACION,new Arbol(simbolo).getInfo(),e.getInfo(),temp));
         RESULT = new Arbol(temp, new Arbol(simbolo), e); 
 }              :}
 		            | RETURN expr:e SEMI 
               {: System.out.println("resultado:"+e.getInfo().getValor());
               Simbolo temp = new Simbolo(Etiqueta.RETURN);
+
+              parser.lineasCodigo.add(Codigo3D.generarLinea(Etiqueta.RETURN,null,e.getInfo(),temp));
               parser.lista3d.add(new Codigo3D(Etiqueta.RETURN,null,e.getInfo(),temp));
               RESULT = new Arbol(temp,null,e); :}
                  | RETURN SEMI 
               {: 
               Simbolo temp = new Simbolo(Etiqueta.RETURN);
+
+              parser.lineasCodigo.add(Codigo3D.generarLinea(Etiqueta.RETURN,null,null,temp));
               parser.lista3d.add(new Codigo3D(Etiqueta.RETURN,null,null,temp));
               RESULT = new Arbol(temp,null,null); :}
                  ;
@@ -138,6 +145,9 @@ non terminal     Tipos TIPO;
          parser.report_fatal_error("Tipos incompatibles en suma (se esperaba INT): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
      }
     Simbolo temp = new Simbolo(Etiqueta.SUMA,"+",Tipos.INT,e1.getInfo().getValor()+e2.getInfo().getValor(),pleft);
+    
+    
+    parser.lineasCodigo.add(Codigo3D.generarLinea(Etiqueta.SUMA,e1.getInfo(),e2.getInfo(),temp));
     parser.lista3d.add(new Codigo3D(Etiqueta.SUMA,e1.getInfo(),e2.getInfo(),temp));
 		RESULT = new Arbol(temp, e1, e2);
 :} 
@@ -146,6 +156,9 @@ non terminal     Tipos TIPO;
          parser.report_fatal_error("Tipos incompatibles en multiplicación (se esperaba INT): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
      }
 Simbolo temp = new Simbolo(Etiqueta.MULT,"*",Tipos.INT,e1.getInfo().getValor()*e2.getInfo().getValor(),tleft);
+      
+      
+      parser.lineasCodigo.add(Codigo3D.generarLinea(Etiqueta.MULT,e1.getInfo(),e2.getInfo(),temp));
       parser.lista3d.add(new Codigo3D(Etiqueta.MULT,e1.getInfo(),e2.getInfo(),temp));
 RESULT = new Arbol(temp, e1, e2);
 
@@ -156,6 +169,9 @@ if (e1.getInfo().getTipo() != Tipos.BOOL || e2.getInfo().getTipo() != Tipos.BOOL
          parser.report_fatal_error("Tipos incompatibles en AND (se esperaba BOOLEAN): " + e1.getInfo().getTipo() + " y " + e2.getInfo().getTipo() + ".\n", null);
      }
      Simbolo temp = new Simbolo(Etiqueta.AND,"&&",Tipos.BOOL,e1.getInfo().getValor() * e2.getInfo().getValor() ==1 ? 1 : 0 ,aleft);
+      
+      
+      parser.lineasCodigo.add(Codigo3D.generarLinea(Etiqueta.AND,e1.getInfo(),e2.getInfo(),temp));
       parser.lista3d.add(new Codigo3D(Etiqueta.AND,e1.getInfo(),e2.getInfo(),temp));
 RESULT = new Arbol(temp, e1, e2);
  :}  
@@ -166,7 +182,10 @@ if (e1.getInfo().getTipo() != Tipos.BOOL || e2.getInfo().getTipo() != Tipos.BOOL
      }
      //Crear c3d y almacenarlo para mostrarlo en orden
      Simbolo temp = new Simbolo(Etiqueta.OR,"||",Tipos.BOOL,(e1.getInfo().getValor() + e2.getInfo().getValor() >=1 ? 1 : 0 ),oleft);
-      parser.lista3d.add(new Codigo3D(Etiqueta.OR,e1.getInfo(),e2.getInfo(),temp));
+     
+     
+     parser.lineasCodigo.add(Codigo3D.generarLinea(Etiqueta.OR,e1.getInfo(),e2.getInfo(),temp));
+     parser.lista3d.add(new Codigo3D(Etiqueta.OR,e1.getInfo(),e2.getInfo(),temp));
 RESULT = new Arbol(temp, e1, e2);
  :} 
                | LPAREN expr:e RPAREN
